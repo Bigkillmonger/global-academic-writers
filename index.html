@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Global Academic Writers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; padding:0; line-height:1.6; background:#f4f4f4; color:#333; }
+    header { background:#002147; color:#fff; padding:20px; text-align:center; }
+    section { padding:30px; background:#fff; margin:20px; border-radius:6px; }
+    h2 { color:#002147; }
+    a.button { display:inline-block; background:#002147; color:#fff; padding:10px 20px; text-decoration:none; border-radius:4px; margin-top:10px; }
+    footer { text-align:center; padding:15px; background:#ddd; }
+    input { display:block; margin:10px 0; padding:8px; width:100%; max-width:300px; }
+    button { padding:10px 20px; background:#002147; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+    #message { margin-top:10px; color:red; font-weight:bold; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Global Academic Writers</h1>
+  <p>Reliable academic writing support you can trust</p>
+</header>
+
+<section>
+  <h2>How It Works</h2>
+  <ol>
+    <li>Client submits academic work requirements</li>
+    <li>We review and assign the task to a qualified writer</li>
+    <li>Client makes payment</li>
+    <li>Work is completed and delivered on time</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Post a Job (For Clients)</h2>
+  <p>Need help with assignments, research papers, or projects?</p>
+  <a class="button" href="https://forms.gle/YOUR_CLIENT_FORM_LINK" target="_blank">Submit Your Work</a>
+</section>
+
+<section>
+  <h2>Writer Packages</h2>
+  <p>Writers must subscribe to access academic tasks. Tasks are assigned daily based on the selected package.</p>
+
+  <h3>Basic Package – KES 800</h3>
+  <ul>
+    <li>Access to up to 4 tasks per day</li>
+    <li>Suitable for part-time writers</li>
+  </ul>
+
+  <h3>Premium Package – KES 1,000</h3>
+  <ul>
+    <li>Access to up to 10 tasks per day</li>
+    <li>Priority task assignment</li>
+  </ul>
+
+  <p><strong>Note:</strong> Writers do not receive tasks unless payment is confirmed.</p>
+
+  <a class="button" href="https://forms.gle/YOUR_WRITER_FORM_LINK" target="_blank">Apply & Subscribe as a Writer</a>
+</section>
+
+<section id="writer-login">
+  <h2>Writer Login / Sign Up</h2>
+
+  <div>
+    <h3>Sign Up</h3>
+    <input type="email" id="signup-email" placeholder="Email">
+    <input type="password" id="signup-password" placeholder="Password">
+    <button onclick="signup()">Sign Up</button>
+  </div>
+
+  <div>
+    <h3>Login</h3>
+    <input type="email" id="login-email" placeholder="Email">
+    <input type="password" id="login-password" placeholder="Password">
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div id="message"></div>
+</section>
+
+<section>
+  <h2>Contact</h2>
+  <p>Email: ezraoyugi18@gmail.com</p>
+</section>
+
+<footer>
+  <p>© 2026 Global Academic Writers</p>
+</footer>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+// Your Firebase config (Ezra's)
+const firebaseConfig = {
+  apiKey: "AIzaSyCDUBCo7NPpbDPvOcF8lUrfogMCTg9qJw8",
+  authDomain: "global-academic-writers.firebaseapp.com",
+  projectId: "global-academic-writers",
+  storageBucket: "global-academic-writers.firebasestorage.app",
+  messagingSenderId: "787268508544",
+  appId: "1:787268508544:web:5b1c307089d1da1c4abf65"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Firebase references
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Sign Up function
+function signup() {
+  const email = document.getElementById('signup-email').value;
+  const password = document.getElementById('signup-password').value;
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      db.collection("users").doc(user.uid).set({
+        email: email,
+        package: "none",
+        paid: false,
+        active: false,
+        dailyLimit: 0,
+        balance: 0
+      });
+      document.getElementById('message').innerText = "Account created! Await payment verification.";
+    })
+    .catch((error) => {
+      document.getElementById('message').innerText = error.message;
+    });
+}
+
+// Login function
+function login() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      db.collection("users").doc(user.uid).get().then((doc) => {
+        if(doc.exists) {
+          if(doc.data().active) {
+            document.getElementById('message').innerText = "Login successful! You can access tasks.";
+          } else {
+            document.getElementById('message').innerText = "Account inactive. Please pay and wait for approval.";
+          }
+        }
+      });
+    })
+    .catch((error) => {
+      document.getElementById('message').innerText = error.message;
+    });
+}
+</script>
+
+</body>
+</html>
