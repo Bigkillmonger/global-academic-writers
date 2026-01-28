@@ -2,162 +2,144 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Global Academic Writers</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; line-height:1.6; background:#f4f4f4; color:#333; }
-    header { background:#002147; color:#fff; padding:20px; text-align:center; }
-    section { padding:30px; background:#fff; margin:20px; border-radius:6px; }
-    h2 { color:#002147; }
-    a.button { display:inline-block; background:#002147; color:#fff; padding:10px 20px; text-decoration:none; border-radius:4px; margin-top:10px; }
-    footer { text-align:center; padding:15px; background:#ddd; }
-    input { display:block; margin:10px 0; padding:8px; width:100%; max-width:300px; }
-    button { padding:10px 20px; background:#002147; color:#fff; border:none; border-radius:4px; cursor:pointer; }
-    #message { margin-top:10px; color:red; font-weight:bold; }
-  </style>
+  <title>Global Academic Writers</title>
 </head>
 <body>
-
-<header>
   <h1>Global Academic Writers</h1>
-  <p>Reliable academic writing support you can trust</p>
-</header>
 
-<section>
-  <h2>How It Works</h2>
-  <ol>
-    <li>Client submits academic work requirements</li>
-    <li>We review and assign the task to a qualified writer</li>
-    <li>Client makes payment</li>
-    <li>Work is completed and delivered on time</li>
-  </ol>
-</section>
+  <!-- LOGIN FORM -->
+  <div id="writer-login">
+    <h2>Login</h2>
+    <input id="login-email" type="email" placeholder="Email">
+    <input id="login-password" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p id="message" style="color:red;"></p>
 
-<section>
-  <h2>Post a Job (For Clients)</h2>
-  <p>Need help with assignments, research papers, or projects?</p>
-  <a class="button" href="https://forms.gle/YOUR_CLIENT_FORM_LINK" target="_blank">Submit Your Work</a>
-</section>
-
-<section>
-  <h2>Writer Packages</h2>
-  <p>Writers must subscribe to access academic tasks. Tasks are assigned daily based on the selected package.</p>
-
-  <h3>Basic Package – KES 800</h3>
-  <ul>
-    <li>Access to up to 4 tasks per day</li>
-    <li>Suitable for part-time writers</li>
-  </ul>
-
-  <h3>Premium Package – KES 1,000</h3>
-  <ul>
-    <li>Access to up to 10 tasks per day</li>
-    <li>Priority task assignment</li>
-  </ul>
-
-  <p><strong>Note:</strong> Writers do not receive tasks unless payment is confirmed.</p>
-
-  <a class="button" href="https://forms.gle/YOUR_WRITER_FORM_LINK" target="_blank">Apply & Subscribe as a Writer</a>
-</section>
-
-<section id="writer-login">
-  <h2>Writer Login / Sign Up</h2>
-
-  <div>
-    <h3>Sign Up</h3>
-    <input type="email" id="signup-email" placeholder="Email">
-    <input type="password" id="signup-password" placeholder="Password">
+    <h3>Or Sign Up</h3>
+    <input id="signup-email" type="email" placeholder="Email">
+    <input id="signup-password" type="password" placeholder="Password">
     <button onclick="signup()">Sign Up</button>
   </div>
 
-  <div>
-    <h3>Login</h3>
-    <input type="email" id="login-email" placeholder="Email">
-    <input type="password" id="login-password" placeholder="Password">
-    <button onclick="login()">Login</button>
-  </div>
+  <!-- DASHBOARD -->
+  <section id="writer-dashboard" style="display:none;">
+    <h2>Writer Dashboard</h2>
+    <p id="welcome-message"></p>
 
-  <div id="message"></div>
-</section>
+    <h3>Your Tasks</h3>
+    <ul id="task-list"></ul>
 
-<section>
-  <h2>Contact</h2>
-  <p>Email: ezraoyugi18@gmail.com</p>
-</section>
+    <p>Daily Limit: <span id="daily-limit">0</span></p>
+    <p>Balance: KES <span id="balance">0</span></p>
 
-<footer>
-  <p>© 2026 Global Academic Writers</p>
-</footer>
+    <button id="withdrawal-button" onclick="requestWithdrawal()">Request Withdrawal</button>
+    <button onclick="logout()">Logout</button>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <div id="dashboard-message" style="color:red; font-weight:bold;"></div>
+  </section>
 
-<script>
-// Your Firebase config (Ezra's)
-const firebaseConfig = {
-  apiKey: "AIzaSyCDUBCo7NPpbDPvOcF8lUrfogMCTg9qJw8",
-  authDomain: "global-academic-writers.firebaseapp.com",
-  projectId: "global-academic-writers",
-  storageBucket: "global-academic-writers.firebasestorage.app",
-  messagingSenderId: "787268508544",
-  appId: "1:787268508544:web:5b1c307089d1da1c4abf65"
-};
+  <!-- FIREBASE SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+  <!-- MAIN SCRIPT -->
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCDUBCo7NPpbDPvOcF8lUrfogMCTg9qJw8",
+      authDomain: "global-academic-writers.firebaseapp.com",
+      projectId: "global-academic-writers",
+      storageBucket: "global-academic-writers.firebasestorage.app",
+      messagingSenderId: "787268508544",
+      appId: "1:787268508544:web:5b1c307089d1da1c4abf65"
+    };
 
-// Firebase references
-const auth = firebase.auth();
-const db = firebase.firestore();
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-// Sign Up function
-function signup() {
-  const email = document.getElementById('signup-email').value;
-  const password = document.getElementById('signup-password').value;
+    // SIGN UP
+    function signup() {
+      const email = document.getElementById('signup-email').value;
+      const password = document.getElementById('signup-password').value;
 
-  auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      db.collection("users").doc(user.uid).set({
-        email: email,
-        package: "none",
-        paid: false,
-        active: false,
-        dailyLimit: 0,
-        balance: 0
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          db.collection("users").doc(user.uid).set({
+            email: email,
+            package: "none",
+            paid: false,
+            active: false,
+            dailyLimit: 0,
+            balance: 0
+          });
+          document.getElementById('message').innerText = "Account created! Await payment verification.";
+        })
+        .catch((error) => {
+          document.getElementById('message').innerText = error.message;
+        });
+    }
+
+    // LOGIN
+    function login() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+
+          db.collection("users").doc(user.uid).get().then((doc) => {
+            if(doc.exists) {
+              const data = doc.data();
+
+              // Hide login form
+              document.getElementById('writer-login').style.display = 'none';
+
+              // Show dashboard for all users
+              document.getElementById('writer-dashboard').style.display = 'block';
+              document.getElementById('welcome-message').innerText = `Welcome, ${data.email}!`;
+              document.getElementById('daily-limit').innerText = data.dailyLimit;
+              document.getElementById('balance').innerText = data.balance;
+
+              if(data.active) {
+                // Active users: show tasks and withdrawal
+                document.getElementById('task-list').innerHTML = "<li>No tasks assigned yet.</li>";
+                document.getElementById('dashboard-message').innerText = "";
+                document.getElementById('withdrawal-button').style.display = 'inline-block';
+              } else {
+                // Inactive users: hide tasks and withdrawal
+                document.getElementById('task-list').innerHTML = "<li>Tasks will appear after payment approval.</li>";
+                document.getElementById('dashboard-message').innerText = "Your account is inactive. Pay to unlock tasks.";
+                document.getElementById('withdrawal-button').style.display = 'none';
+              }
+            }
+          });
+        })
+        .catch((error) => {
+          document.getElementById('message').innerText = error.message;
+        });
+    }
+
+    // LOGOUT
+    function logout() {
+      auth.signOut().then(() => {
+        document.getElementById('writer-dashboard').style.display = 'none';
+        document.getElementById('writer-login').style.display = 'block';
+        document.getElementById('message').innerText = "Logged out successfully.";
       });
-      document.getElementById('message').innerText = "Account created! Await payment verification.";
-    })
-    .catch((error) => {
-      document.getElementById('message').innerText = error.message;
-    });
-}
+    }
 
-// Login function
-function login() {
-  const email = document.getElementById('login-email').value;
-  const password = document.getElementById('login-password').value;
-
-  auth.signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      db.collection("users").doc(user.uid).get().then((doc) => {
-        if(doc.exists) {
-          if(doc.data().active) {
-            document.getElementById('message').innerText = "Login successful! You can access tasks.";
-          } else {
-            document.getElementById('message').innerText = "Account inactive. Please pay and wait for approval.";
-          }
-        }
-      });
-    })
-    .catch((error) => {
-      document.getElementById('message').innerText = error.message;
-    });
-}
-</script>
-
+    // WITHDRAWAL (placeholder)
+    function requestWithdrawal() {
+      document.getElementById('dashboard-message').innerText = "Withdrawal request sent. Await approval.";
+    }
+  </script>
 </body>
 </html>
+
+
